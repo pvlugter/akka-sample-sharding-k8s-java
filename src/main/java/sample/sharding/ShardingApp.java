@@ -18,17 +18,19 @@ public class ShardingApp {
     // If we have added ports on the command line, then override them in the config and start multiple actor systems
     if (args.length > 0) {
       // Check that we have an even number of ports, one remoting and one http for each actor system
-      if (args.length % 2 == 1) {
-        System.out.println("[ERROR] Need an even number of ports! One remoting and one HTTP port for each actor system.");
+      if (args.length % 3 == 1) {
+        System.out.println("[ERROR] Need sets of three ports! One remoting, one HTTP, one metrics port for each actor system.");
         System.exit(1);
       }
-      for (int i = 0; i < args.length; i += 2) {
+      for (int i = 0; i < args.length; i += 3) {
         String remoting = args[i];
         String http = args[i + 1];
+        String metrics = args[i + 2];
         // Override the configuration of the port
         Config config = ConfigFactory.parseString(
           "akka.remote.netty.tcp.port = " + remoting + "\n" +
-          "sample.http.port = " + http).withFallback(baseConfig);
+          "sample.http.port = " + http + "\n" +
+          "cinnamon.prometheus.http-server.port = " + metrics).withFallback(baseConfig);
         createAndStartActorSystem(actorSystemName, config);
       }
     }

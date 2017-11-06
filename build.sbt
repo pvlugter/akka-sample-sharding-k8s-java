@@ -7,7 +7,7 @@ val akkaHttpVersion = "10.0.9"
 
 val `akka-sample-sharding-k8s-java` = project
   .in(file("."))
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging, Cinnamon)
   .settings(
     organization := "akka.sharding.sample",
     scalaVersion := "2.12.2",
@@ -16,7 +16,11 @@ val `akka-sample-sharding-k8s-java` = project
     javacOptions in doc in Compile := Seq("-Xdoclint:none"),
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion force(),
-      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion),
+      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      Cinnamon.library.cinnamonAkka,
+      Cinnamon.library.cinnamonAkkaHttp,
+      Cinnamon.library.cinnamonPrometheusHttpServer),
+    cinnamon in run := true,
     fork in run := true,
     mainClass in (Compile, run) := Some("sample.sharding.ShardingApp"),
     // disable parallel tests
@@ -34,6 +38,8 @@ val `akka-sample-sharding-k8s-java` = project
       """-Dakka.cluster.seed-nodes.2="akka.tcp://${AKKA_ACTOR_SYSTEM_NAME}@${AKKA_SEED_NODE_HOST_2}:${AKKA_SEED_NODE_PORT}"""",
       """-Dsample.http.hostname="$SAMPLE_HTTP_HOST"""",
       """-Dsample.http.port="$SAMPLE_HTTP_PORT"""",
+      """-Dcinnamon.prometheus.http-server.host="$CINNAMON_PROMETHEUS_HOST"""",
+      """-Dcinnamon.prometheus.http-server.port="$CINNAMON_PROMETHEUS_PORT"""",
       "-Dakka.io.dns.resolver=async-dns",
       "-Dakka.io.dns.async-dns.resolve-srv=true",
       "-Dakka.io.dns.async-dns.resolv-conf=on"

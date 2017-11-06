@@ -111,7 +111,7 @@ This diagram shows how a request is routed for an entity that is in a shard that
 Running the sample locally will create one or more akka actor systems that each have an HTTP server, and join them in a cluster.
 
 ```
-> sbt "run 2551 8081 2552 8082 2553 8083"
+> sbt "run 2551 8081 9091 2552 8082 9092 2553 8083 9093"
 ...
 [info] [INFO] [09/11/2017 09:09:37.791] [ShardingSample-akka.actor.default-dispatcher-2] [akka://ShardingSample/user/$a] Server online at http://localhost:8081/
 [info] [INFO] [09/11/2017 09:09:37.791] [ShardingSample-akka.actor.default-dispatcher-20] [akka://ShardingSample/user/$a] Server online at http://localhost:8082/

@@ -10,6 +10,9 @@ spec:
       labels:
         app: sharding-sample
         type: sharding-sample-seed
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9102'
     spec:
       containers:
       - name: sharding-sample
@@ -21,6 +24,9 @@ spec:
           protocol: TCP
         - containerPort: 2551
           name: akka-remote
+          protocol: TCP
+        - containerPort: 9102
+          name: cinnamon
           protocol: TCP
         resources:
           limits:
@@ -54,6 +60,10 @@ spec:
           value: '8080'
         - name: SAMPLE_HTTP_HOST
           value: "$(POD_NAME)"
+        - name: CINNAMON_PROMETHEUS_PORT
+          value: '9102'
+        - name: CINNAMON_PROMETHEUS_HOST
+          value : "$(POD_NAME)"
         readinessProbe:
           tcpSocket:
             port: 2551
