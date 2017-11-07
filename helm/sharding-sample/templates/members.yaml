@@ -1,0 +1,68 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-members
+spec:
+  replicas: {{ .Values.members.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        type: {{ .Chart.Name }}-member
+        release: {{ .Release.Name }}
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '{{ .Values.cinnamon.prometheus.port }}'
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: samplegroup/akka-sample-sharding-k8s-java
+        imagePullPolicy: Never
+        ports:
+        - containerPort: {{ .Values.akka.http.port }}
+          name: akka-http
+        - containerPort: {{ .Values.akka.remote.port }}
+          name: akka-remote
+        - containerPort: {{ .Values.cinnamon.prometheus.port }}
+          name: cinnamon
+        resources:
+          limits:
+            cpu: 250m
+            memory: 384Mi
+          requests:
+            cpu: 250m
+            memory: 384Mi
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: AKKA_ACTOR_SYSTEM_NAME
+          value: {{ .Chart.Name }}
+        - name: AKKA_REMOTING_LOGICAL_HOST
+          value: "$(POD_IP)"
+        - name: AKKA_REMOTING_BIND_HOST
+          value: "$(POD_IP)"
+        - name: AKKA_REMOTING_BIND_PORT
+          value: '{{ .Values.akka.remote.port }}'
+        - name: AKKA_SEED_NODE_PORT
+          value: '{{ .Values.akka.remote.port }}'
+        - name: AKKA_SEED_NODE_HOST_0
+          value: {{ .Chart.Name }}-seeds-0.akka-remote-seed
+        - name: AKKA_SEED_NODE_HOST_1
+          value: {{ .Chart.Name }}-seeds-1.akka-remote-seed
+        - name: AKKA_SEED_NODE_HOST_2
+          value: {{ .Chart.Name }}-seeds-2.akka-remote-seed
+        - name: SAMPLE_HTTP_PORT
+          value: '{{ .Values.akka.http.port }}'
+        - name: SAMPLE_HTTP_HOST
+          value: "$(POD_IP)"
+        - name: CINNAMON_PROMETHEUS_PORT
+          value: '{{ .Values.cinnamon.prometheus.port }}'
+        - name: CINNAMON_PROMETHEUS_HOST
+          value : "$(POD_IP)"
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.akka.remote.port }}
+          initialDelaySeconds: 30
+          timeoutSeconds: 30

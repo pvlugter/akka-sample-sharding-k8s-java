@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: akka-remote-seed
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.akka.remote.port }}
+    protocol: TCP
+    targetPort: {{ .Values.akka.remote.port }}
+    name: akka-remote
+  selector:
+    type: {{ .Chart.Name }}-seed
+    release: {{ .Release.Name }}

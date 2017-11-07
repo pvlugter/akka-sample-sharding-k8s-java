@@ -1,0 +1,5 @@
+
+Accessing the Sharding Sample app when running in Minikube:
+
+export HTTP_SERVICE="$(minikube service {{ .Chart.Name }}-http --url)"
+curl "$HTTP_SERVICE/customer/4711/address"

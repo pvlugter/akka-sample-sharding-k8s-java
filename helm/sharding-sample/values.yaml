@@ -1,0 +1,19 @@
+# Default values for sharding-sample
+
+seeds:
+  replicas: 1
+members:
+  replicas: 2
+
+app:
+  port: 80
+
+akka:
+  http:
+    port: 8080
+  remote:
+    port: 2551
+
+cinnamon:
+  prometheus:
+    port: 9201
